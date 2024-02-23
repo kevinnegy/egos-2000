@@ -29,6 +29,7 @@ extern struct process proc_set[MAX_NPROCESS];
 
 void intr_entry(int);
 void excp_entry(int);
+void handle_syscall(void);
 
 int  proc_alloc();
 void proc_free(int);
