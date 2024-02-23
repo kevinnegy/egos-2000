@@ -54,15 +54,18 @@ void intr_entry(int id) {
         return;
     }
 
-    if (id == INTR_ID_SOFT)
-        kernel_entry = proc_syscall;
-    else if (id == INTR_ID_TIMER)
+    if (id == INTR_ID_SOFT){
+        handle_syscall();
+    }
+    else if (id == INTR_ID_TIMER){
         kernel_entry = proc_yield;
-    else
-        FATAL("intr_entry: got unknown interrupt %d", id);
 
-    /* Switch to the kernel stack */
-    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
+        /* Switch to the kernel stack */
+        ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
+    }
+    else {
+        FATAL("intr_entry: got unknown interrupt %d", id);
+    }
 }
 
 void ctx_entry() {
@@ -195,4 +198,9 @@ static void proc_syscall() {
     default:
         FATAL("proc_syscall: got unknown syscall type=%d", type);
     }
+}
+
+void handle_syscall(){
+    kernel_entry = proc_syscall;
+    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
 }
